@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const { Schema } = require("mongoose");
-const validator = require("validator");
 
 const personSchema = new Schema(
   {
     name: {
       type: String,
+      unique: true,
       trim: true,
     },
     birthDate: {

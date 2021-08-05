@@ -1,11 +1,13 @@
 const express = require("express");
 const helmet = require("helmet");
 const { json } = require("body-parser");
+const morgan = require("morgan");
 
 // express
 const app = express();
 
 // middleware
+app.use(morgan("dev"));
 app.use(helmet());
 app.use(json());
 
