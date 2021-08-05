@@ -11,7 +11,7 @@ const movieSchema = new Schema(
       required: true,
     },
     releaseYear: {
-      type: Date,
+      type: Number,
     },
     genres: [
       {
@@ -28,6 +28,7 @@ const movieSchema = new Schema(
             "Romance",
             "Thriller",
             "Western",
+            "Historical",
           ],
           message: "{VALUE} is not supported",
         },

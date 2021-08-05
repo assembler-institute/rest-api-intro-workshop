@@ -20,7 +20,14 @@ const personSchema = new Schema(
         type: String,
         required: true,
         enum: {
-          values: ["director", "composer", "actor"],
+          values: [
+            "Director",
+            "Composer",
+            "Actor",
+            "Writer",
+            "Film Producer",
+            "Actress",
+          ],
           message: "{VALUE} is not supported",
         },
       },
