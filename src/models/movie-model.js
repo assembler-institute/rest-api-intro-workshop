@@ -55,6 +55,7 @@ const movieSchema = new Schema(
     crew: {
       type: [mongoose.SchemaTypes.ObjectId],
       required: true,
+      unique: true,
       ref: "person",
       validate: {
         validator: (v) => v.length > 0,
@@ -67,6 +68,10 @@ const movieSchema = new Schema(
     timestamps: true,
   },
 );
+
+// movieSchema.pre("findOneAndUpdate", function () {
+//   console.log(this);
+// });
 
 const Movie = mongoose.model("movie", movieSchema);
 

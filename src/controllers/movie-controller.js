@@ -67,16 +67,21 @@ async function patchMovie(req, res, next) {
   const { id: movieId } = req.params;
 
   try {
-    const movies = await db.Movie.findOneAndUpdate(
+    const movie = await db.Movie.findOneAndUpdate(
       { _id: movieId },
       { ...req.body },
       { new: true },
     );
 
-    res.status(200).send({
-      data: movies,
-      message: "Movie updated successfully!",
-    });
+    if (!movie) {
+      res.status(200).send({ message: "There is no movie with id " + movieId });
+      next();
+    } else {
+      res.status(200).send({
+        data: movie,
+        message: "Movie updated successfully!",
+      });
+    }
   } catch (err) {
     res.status(400).send({ error: err.message });
     next(err);
@@ -106,10 +111,85 @@ async function deleteMovie(req, res, next) {
   }
 }
 
+async function fetchCredits(req, res, next) {
+  const { id: movieId } = req.params;
+
+  try {
+    const credits = await db.Movie.findById(movieId)
+      .populate("cast")
+      .populate("crew");
+
+    res.status(200).send({ data: credits });
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+    next(err);
+  }
+}
+
+async function postCredits(req, res, next) {
+  const { id: movieId } = req.params;
+  const { crew = undefined, cast = undefined } = req.body;
+
+  try {
+    const movie = await db.Movie.findByIdAndUpdate(
+      { _id: movieId },
+      { $addToSet: { crew: crew, cast: cast } },
+      { new: true, omitUndefined: true },
+    );
+
+    if (!movie) {
+      res.status(400).send({ message: "Credit id not found!" });
+    } else {
+      res.status(200).send({
+        data: movie,
+        message: "Credit updated successfully!",
+      });
+    }
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+    next(err);
+  }
+}
+
+async function patchCredits(req, res, next) {}
+async function deleteCredits(req, res, next) {}
+
+async function validateCastCrew(req, res, next) {
+  const { crew = undefined, cast = undefined } = req.body;
+
+  try {
+    // Validate crew
+    if (crew) {
+      const cr = await db.Person.findById(crew);
+      if (!cr) {
+        res.status(400).send({ msg: "crew not found in Person collection!" });
+        return;
+      }
+    }
+
+    // Validate cast
+    if (cast) {
+      const ct = await db.Person.findById(cast);
+      if (!ct) {
+        res.status(400).send({ msg: "cast not found in Person collection!" });
+        return;
+      }
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   fetchMovies,
   fetchMovieById,
   postMovie,
   patchMovie,
   deleteMovie,
+  fetchCredits,
+  postCredits,
+  patchCredits,
+  deleteCredits,
+  validateCastCrew,
 };
