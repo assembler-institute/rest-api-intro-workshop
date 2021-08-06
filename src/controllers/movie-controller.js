@@ -49,14 +49,14 @@ async function postMovie(req, res, next) {
     if (movie) {
       res.status(400).send({ message: "Movie already exists!" });
       next();
+    } else {
+      await db.Movie.create(req.body);
+
+      res.status(200).send({
+        data: req.body,
+        message: "Movie created successfully!",
+      });
     }
-
-    await db.Movie.create(req.body);
-
-    res.status(200).send({
-      data: req.body,
-      message: "Movie created successfully!",
-    });
   } catch (err) {
     res.status(400).send({ error: err.message });
     next(err);

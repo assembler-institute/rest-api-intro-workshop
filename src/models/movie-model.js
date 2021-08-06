@@ -13,37 +13,54 @@ const movieSchema = new Schema(
     releaseYear: {
       type: Number,
     },
-    genres: [
-      {
-        type: String,
-        required: true,
-        enum: {
-          values: [
-            "Action",
-            "Comedy",
-            "Drama",
-            "Fantasy",
-            "Horror",
-            "Mystery",
-            "Romance",
-            "Thriller",
-            "Western",
-            "Historical",
-          ],
-          message: "{VALUE} is not supported",
-        },
+    genres: {
+      type: [String],
+      required: true,
+      enum: {
+        values: [
+          "Action",
+          "Comedy",
+          "Drama",
+          "Fantasy",
+          "Horror",
+          "Mystery",
+          "Romance",
+          "Thriller",
+          "Western",
+          "Historical",
+        ],
+        message: "{VALUE} is not supported",
       },
-    ],
+
+      validate: {
+        validator: (v) => v.length > 0,
+        message: (props) => `Must be an Array and not empty`,
+      },
+    },
     duration: {
       //TODO: add a getter to convert it
       type: Number, // seconds
     },
-    cast: [
-      { type: mongoose.SchemaTypes.ObjectId, required: true, ref: "person" },
-    ],
-    crew: [
-      { type: mongoose.SchemaTypes.ObjectId, required: true, ref: "person" },
-    ],
+
+    // TODO: Manage Repeated properties
+    cast: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      required: true,
+      ref: "person",
+      validate: {
+        validator: (v) => v.length > 0,
+        message: (props) => `Must be an Array and not empty`,
+      },
+    },
+    crew: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      required: true,
+      ref: "person",
+      validate: {
+        validator: (v) => v.length > 0,
+        message: (props) => `Must be an Array and not empty`,
+      },
+    },
   },
 
   {

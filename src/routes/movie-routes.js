@@ -9,6 +9,7 @@ movieRouter.post("/", movieController.postMovie);
 movieRouter.get("/:id", movieController.fetchMovieById);
 movieRouter.patch("/:id", movieController.patchMovie);
 movieRouter.delete("/:id", movieController.deleteMovie);
+movieRouter.delete("/:id/credits", movieController.deleteMovie);
 
 module.exports = {
   movieRouter,
