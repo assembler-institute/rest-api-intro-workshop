@@ -3,6 +3,7 @@ const helmet = require("helmet");
 const { json } = require("body-parser");
 const morgan = require("morgan");
 const { movieRouter, personRouter, userRouter } = require("./routes");
+const { authMiddleware } = require("./middlewares");
 
 // express
 const app = express();
@@ -14,6 +15,7 @@ app.use(json());
 
 // routes
 app.use("/users", userRouter);
+app.use("/", authMiddleware.checkToken);
 app.use("/movies", movieRouter);
 app.use("/persons", personRouter);
 
