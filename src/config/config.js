@@ -9,6 +9,7 @@ const {
   MONGO_DB_URL_PRODUCTION,
   MONGO_DB_URL_DEVELOPMENT,
   MONGO_DB_URL_TEST,
+  ACCESS_TOKEN_SECRET,
   PORT = 4000,
   ENCRYPTION_SALT_DEVELOPMENT,
   ENCRYPTION_SALT_PRODUCTION,
@@ -32,6 +33,9 @@ const CONFIG = {
     encrypt: {
       salt: ENCRYPTION_SALT_PRODUCTION,
     },
+    jwt: {
+      SECRET: ACCESS_TOKEN_SECRET,
+    },
   },
   development: {
     app: {
@@ -50,6 +54,9 @@ const CONFIG = {
     encrypt: {
       salt: ENCRYPTION_SALT_DEVELOPMENT,
     },
+    jwt: {
+      SECRET: ACCESS_TOKEN_SECRET,
+    },
   },
   test: {
     app: {
@@ -64,6 +71,9 @@ const CONFIG = {
     },
     db: {
       url: MONGO_DB_URL_TEST,
+    },
+    jwt: {
+      SECRET: ACCESS_TOKEN_SECRET,
     },
   },
 };
