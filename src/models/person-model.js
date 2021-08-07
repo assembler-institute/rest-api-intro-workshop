@@ -39,6 +39,11 @@ const personSchema = new Schema(
   },
 );
 
+// TODO: un virtual para formatear la fecha que se manda al usuario
+
+// TODO: se podria hacer un descriminator para heredar de un
+// TODO: esquema padre que contiene todos esos virtuales
+
 const Person = mongoose.model("person", personSchema);
 
 module.exports = Person;

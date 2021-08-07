@@ -45,6 +45,11 @@ async function fetchMovieById(req, res, next) {
   try {
     const movie = await db.Movie.findById(movieId).lean();
 
+    if (!movie) {
+      res.status(400).send({ message: "Movie not found" });
+      return;
+    }
+
     res.status(200).send({ data: movie });
   } catch (err) {
     res.status(400).send({ error: err.message });

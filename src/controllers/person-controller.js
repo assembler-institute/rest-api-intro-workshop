@@ -40,12 +40,17 @@ async function fetchPersons(req, res, next) {
  * @param {*} next
  */
 async function fetchPersonById(req, res, next) {
-  const { id: movieId } = req.params;
+  const { id: personId } = req.params;
 
   try {
-    const movie = await db.Movie.findById(movieId).lean();
+    const person = await db.Person.findById(personId).lean();
 
-    res.status(200).send({ data: movie });
+    if (!person) {
+      res.status(400).send({ message: "Person not found" });
+      return;
+    }
+
+    res.status(200).send({ data: person });
   } catch (err) {
     res.status(400).send({ error: err.message });
     next(err);
@@ -59,22 +64,22 @@ async function fetchPersonById(req, res, next) {
  * @param {*} next
  */
 async function postPerson(req, res, next) {
-  const { title } = req.body;
+  const { name } = req.body;
 
   try {
-    const movie = await db.Movie.findOne({ title });
+    const person = await db.Person.findOne({ name });
 
-    if (movie) {
-      res.status(400).send({ message: "Movie already exists!" });
-      next();
-    } else {
-      await db.Movie.create(req.body);
-
-      res.status(201).send({
-        data: req.body,
-        message: "Movie created successfully!",
-      });
+    if (person) {
+      res.status(400).send({ message: "Person already exists!" });
+      return;
     }
+
+    await db.Person.create(req.body);
+
+    res.status(201).send({
+      data: req.body,
+      message: "Person created successfully!",
+    });
   } catch (err) {
     res.status(400).send({ error: err.message });
     next(err);
