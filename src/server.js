@@ -13,6 +13,7 @@ app.use(helmet());
 app.use(json());
 
 // routes
+app.use("/users", movieRouter);
 app.use("/movies", movieRouter);
 app.use("/persons", personRouter);
 

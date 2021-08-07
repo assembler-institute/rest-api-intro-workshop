@@ -10,6 +10,7 @@ connect()
     // await seed.seedUsers();
     // await seed.seedPersons();
     // await seed.seedMovies();
+    await seed.seedRoles();
 
     // start Server
     app.listen(config.app.PORT, () => {

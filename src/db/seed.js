@@ -14,7 +14,21 @@ async function seedPersons() {
   await db.Person.create([...persons]);
 }
 
+async function seedUsers() {
+  const persons = [...getSeedPersons()].map((person) => ({ ...person }));
+  await db.Person.deleteMany({});
+  await db.Person.create([...persons]);
+}
+
+async function seedRoles() {
+  const roles = [{ name: "Admin" }, { name: "User" }];
+  await db.Role.deleteMany({});
+  await db.Role.create(roles);
+}
+
 module.exports = {
-  seedMovies: seedMovies,
-  seedPersons: seedPersons,
+  seedMovies,
+  seedPersons,
+  seedUsers,
+  seedRoles,
 };
