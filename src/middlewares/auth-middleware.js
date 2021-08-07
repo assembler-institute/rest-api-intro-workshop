@@ -18,9 +18,9 @@ async function checkToken(req, res, next) {
         .send({ message: "You need a token, please register!" });
 
     const decoded = jwt.verify(token, config.jwt.SECRET);
-    const _id = decoded.id;
+    req.userId = decoded._id;
 
-    const user = db.User.findById(_id, { password: 0 });
+    const user = await db.User.findById(req.userId, { password: 0 });
 
     if (!user) return res.status(404).send({ message: "User not found!" });
 
@@ -30,4 +30,29 @@ async function checkToken(req, res, next) {
   }
 }
 
-module.exports = { checkToken };
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+async function isAdmin(req, res, next) {
+  const { userId } = req;
+
+  try {
+    const user = await db.User.findOne(
+      { _id: userId },
+      { password: 0 },
+    ).populate({
+      path: "roles",
+      match: { name: "Admin" },
+    });
+
+    if (!user.roles.length)
+      return res.status(400).send({ message: "Must be an admin" });
+    else next();
+  } catch (err) {
+    return res.status(400).send({ message: err.message });
+  }
+}
+module.exports = { checkToken, isAdmin };
