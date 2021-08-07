@@ -1,5 +1,11 @@
 const db = require("../models");
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
 async function fetchMovies(req, res, next) {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 5;
@@ -27,6 +33,12 @@ async function fetchMovies(req, res, next) {
   }
 }
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
 async function fetchMovieById(req, res, next) {
   const { id: movieId } = req.params;
 
@@ -40,6 +52,12 @@ async function fetchMovieById(req, res, next) {
   }
 }
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
 async function postMovie(req, res, next) {
   const { title } = req.body;
 
@@ -52,7 +70,7 @@ async function postMovie(req, res, next) {
     } else {
       await db.Movie.create(req.body);
 
-      res.status(200).send({
+      res.status(201).send({
         data: req.body,
         message: "Movie created successfully!",
       });
@@ -63,6 +81,12 @@ async function postMovie(req, res, next) {
   }
 }
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
 async function patchMovie(req, res, next) {
   const { id: movieId } = req.params;
 
@@ -88,6 +112,12 @@ async function patchMovie(req, res, next) {
   }
 }
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
 async function deleteMovie(req, res, next) {
   const { id: movieId } = req.params;
 
@@ -95,10 +125,8 @@ async function deleteMovie(req, res, next) {
     const movie = await db.Movie.findByIdAndDelete(movieId);
 
     if (!movie) {
-      res.status(200).send({
-        message: "Can't remove this movie!",
-      });
-      next();
+      res.status(200).send({ message: "Movie not found!" });
+      return;
     }
 
     res.status(200).send({
@@ -111,6 +139,12 @@ async function deleteMovie(req, res, next) {
   }
 }
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
 async function fetchCredits(req, res, next) {
   const { id: movieId } = req.params;
 
@@ -126,6 +160,12 @@ async function fetchCredits(req, res, next) {
   }
 }
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
 async function postCredits(req, res, next) {
   const { id: movieId } = req.params;
   const { crew = undefined, cast = undefined } = req.body;
@@ -140,7 +180,7 @@ async function postCredits(req, res, next) {
     if (!movie) {
       res.status(400).send({ message: "Credit id not found!" });
     } else {
-      res.status(200).send({
+      res.status(201).send({
         data: movie,
         message: "Credit updated successfully!",
       });
@@ -151,33 +191,63 @@ async function postCredits(req, res, next) {
   }
 }
 
-async function patchCredits(req, res, next) {}
-async function deleteCredits(req, res, next) {}
-
-async function validateCastCrew(req, res, next) {
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+async function patchCredits(req, res, next) {
+  const { id: movieId } = req.params;
   const { crew = undefined, cast = undefined } = req.body;
 
   try {
-    // Validate crew
-    if (crew) {
-      const cr = await db.Person.findById(crew);
-      if (!cr) {
-        res.status(400).send({ msg: "crew not found in Person collection!" });
-        return;
-      }
+    const movie = await db.Movie.findById(movieId);
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+    next(err);
+  }
+}
+
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+async function deleteCredits(req, res, next) {
+  const { id: movieId, creditId } = req.params;
+
+  try {
+    const movie = await db.Movie.findById(movieId);
+
+    if (!movie) {
+      res.status(400).send({ message: "Movie not found!" });
+      return;
     }
 
-    // Validate cast
-    if (cast) {
-      const ct = await db.Person.findById(cast);
-      if (!ct) {
-        res.status(400).send({ msg: "cast not found in Person collection!" });
-        return;
-      }
+    const updatedCrews = movie.crew.filter((id) => id != creditId);
+    const updatedCasts = movie.cast.filter((id) => id != creditId);
+
+    if (
+      updatedCrews.length == movie.crew.length &&
+      updatedCasts.length == movie.cast.length
+    ) {
+      res.status(400).send({ message: "Crew / Cast not found!" });
+      return;
     }
-    next();
-  } catch (error) {
-    next(error);
+
+    movie.crew = updatedCrews;
+    movie.cast = updatedCasts;
+    const updatedMovie = await movie.save();
+
+    res.status(200).send({
+      data: updatedMovie,
+      message: "Crew / Cast deleted successfully!",
+    });
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+    next(err);
   }
 }
 
@@ -191,5 +261,4 @@ module.exports = {
   postCredits,
   patchCredits,
   deleteCredits,
-  validateCastCrew,
 };

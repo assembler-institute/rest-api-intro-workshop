@@ -1,6 +1,7 @@
 const Router = require("express").Router;
 
 const { movieController } = require("../controllers");
+const { validateCastCrew } = require("../middlewares");
 
 const movieRouter = Router();
 
@@ -14,13 +15,9 @@ movieRouter.delete("/:id", movieController.deleteMovie);
 // Credits requests
 // TODO: consider movieRouter.all("/:id/credits", movieController.);
 movieRouter.get("/:id/credits", movieController.fetchCredits);
-movieRouter.post(
-  "/:id/credits",
-  movieController.validateCastCrew,
-  movieController.postCredits,
-);
+movieRouter.post("/:id/credits", validateCastCrew, movieController.postCredits);
 movieRouter.patch("/:id/credits", movieController.patchCredits);
-movieRouter.delete("/:id/credits", movieController.deleteCredits);
+movieRouter.delete("/:id/credits/:creditId", movieController.deleteCredits);
 
 module.exports = {
   movieRouter,
