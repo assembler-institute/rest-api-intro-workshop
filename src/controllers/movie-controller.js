@@ -77,8 +77,8 @@ async function postMovie(req, res, next) {
     await db.Movie.create(req.body);
 
     res.status(201).send({
-      data: req.body,
       message: "Movie created successfully!",
+      data: req.body,
     });
   } catch (err) {
     res.status(400).send({ error: err.message });
@@ -108,8 +108,8 @@ async function patchMovie(req, res, next) {
     }
 
     res.status(200).send({
-      data: movie,
       message: "Movie updated successfully!",
+      data: movie,
     });
   } catch (err) {
     res.status(400).send({ error: err.message });
@@ -135,8 +135,8 @@ async function deleteMovie(req, res, next) {
     }
 
     res.status(200).send({
-      data: movie,
       message: "Movie deleted successfully!",
+      data: movie,
     });
   } catch (err) {
     res.status(400).send({ error: err.message });
@@ -186,8 +186,8 @@ async function postCredits(req, res, next) {
       res.status(400).send({ message: "Credit id not found!" });
     } else {
       res.status(201).send({
-        data: movie,
         message: "Credit updated successfully!",
+        data: movie,
       });
     }
   } catch (err) {
@@ -239,8 +239,8 @@ async function deleteCredits(req, res, next) {
     const updatedMovie = await movie.save();
 
     res.status(200).send({
-      data: updatedMovie,
       message: "Crew / Cast deleted successfully!",
+      data: updatedMovie,
     });
   } catch (err) {
     res.status(400).send({ error: err.message });

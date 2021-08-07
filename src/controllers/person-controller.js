@@ -77,8 +77,8 @@ async function postPerson(req, res, next) {
     await db.Person.create(req.body);
 
     res.status(201).send({
-      data: req.body,
       message: "Person created successfully!",
+      data: req.body,
     });
   } catch (err) {
     res.status(400).send({ error: err.message });
@@ -108,8 +108,8 @@ async function patchPerson(req, res, next) {
     }
 
     res.status(200).send({
-      data: person,
       message: "Person updated successfully!",
+      data: person,
     });
   } catch (err) {
     res.status(400).send({ error: err.message });
@@ -135,8 +135,8 @@ async function deletePerson(req, res, next) {
     }
 
     res.status(200).send({
-      data: person,
       message: "Person deleted successfully!",
+      data: person,
     });
   } catch (err) {
     res.status(400).send({ error: err.message });
