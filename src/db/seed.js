@@ -1,6 +1,7 @@
 const db = require("../models");
 const { getSeedMovies } = require("./data-movie");
 const { getSeedPersons } = require("./data-person");
+const { getSeedUsers } = require("./data-user");
 
 async function seedMovies() {
   const movies = [...getSeedMovies()].map((movie) => ({ ...movie }));
@@ -15,20 +16,25 @@ async function seedPersons() {
 }
 
 async function seedUsers() {
-  const persons = [...getSeedPersons()].map((person) => ({ ...person }));
-  await db.Person.deleteMany({});
-  await db.Person.create([...persons]);
-}
+  const users = [...getSeedUsers()].map(async (user) => {
+    const roleIds = await db.Role.find(
+      { name: { $in: user.roles } },
+      { __v: 0, name: 0 },
+    );
 
-async function seedRoles() {
-  const roles = [{ name: "Admin" }, { name: "User" }];
-  await db.Role.deleteMany({});
-  await db.Role.create(roles);
+    ids = roleIds.map((roleId) => roleId._id);
+    user.roles = ids;
+    return user;
+  });
+
+  const results = await Promise.all(users);
+
+  await db.User.deleteMany({});
+  await db.User.create([...results]);
 }
 
 module.exports = {
   seedMovies,
   seedPersons,
   seedUsers,
-  seedRoles,
 };

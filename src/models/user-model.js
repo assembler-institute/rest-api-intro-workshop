@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = require("mongoose");
 const validator = require("validator");
-const { roleSchema } = require("./role-model");
 
 const userSchema = new Schema(
   {
@@ -27,7 +26,10 @@ const userSchema = new Schema(
       type: String,
       unique: true,
     },
-    roles: [roleSchema],
+    roles: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      ref: "role",
+    },
   },
 
   {
