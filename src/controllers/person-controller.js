@@ -96,21 +96,21 @@ async function patchPerson(req, res, next) {
   const { id: personId } = req.params;
 
   try {
-    const person = await db.Movie.findOneAndUpdate(
+    const person = await db.Person.findOneAndUpdate(
       { _id: personId },
       { ...req.body },
       { new: true },
     );
 
     if (!person) {
-      res.status(200).send({ message: "There is no movie with id " + movieId });
-      next();
-    } else {
-      res.status(200).send({
-        data: movie,
-        message: "Movie updated successfully!",
-      });
+      res.status(400).send({ message: `Person with id ${personId} not found` });
+      return;
     }
+
+    res.status(200).send({
+      data: person,
+      message: "Person updated successfully!",
+    });
   } catch (err) {
     res.status(400).send({ error: err.message });
     next(err);
@@ -130,7 +130,7 @@ async function deletePerson(req, res, next) {
     const person = await db.Person.findByIdAndDelete(personId);
 
     if (!person) {
-      res.status(200).send({ message: "Person not found!" });
+      res.status(400).send({ message: "Person not found!" });
       return;
     }
 

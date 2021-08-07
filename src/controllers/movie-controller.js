@@ -71,15 +71,15 @@ async function postMovie(req, res, next) {
 
     if (movie) {
       res.status(400).send({ message: "Movie already exists!" });
-      next();
-    } else {
-      await db.Movie.create(req.body);
-
-      res.status(201).send({
-        data: req.body,
-        message: "Movie created successfully!",
-      });
+      return;
     }
+
+    await db.Movie.create(req.body);
+
+    res.status(201).send({
+      data: req.body,
+      message: "Movie created successfully!",
+    });
   } catch (err) {
     res.status(400).send({ error: err.message });
     next(err);
@@ -103,14 +103,14 @@ async function patchMovie(req, res, next) {
     );
 
     if (!movie) {
-      res.status(200).send({ message: "There is no movie with id " + movieId });
-      next();
-    } else {
-      res.status(200).send({
-        data: movie,
-        message: "Movie updated successfully!",
-      });
+      res.status(400).send({ message: "There is no movie with id " + movieId });
+      return;
     }
+
+    res.status(200).send({
+      data: movie,
+      message: "Movie updated successfully!",
+    });
   } catch (err) {
     res.status(400).send({ error: err.message });
     next(err);
@@ -130,7 +130,7 @@ async function deleteMovie(req, res, next) {
     const movie = await db.Movie.findByIdAndDelete(movieId);
 
     if (!movie) {
-      res.status(200).send({ message: "Movie not found!" });
+      res.status(400).send({ message: "Movie not found!" });
       return;
     }
 
