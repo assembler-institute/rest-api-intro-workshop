@@ -13,7 +13,7 @@ async function encryptPassword(data) {
   return encryptedData;
 }
 
-async function comparePassword({ plainData, encryptedData }) {
+async function comparePassword(plainData, encryptedData) {
   const isSame = await bcrypt.compare(plainData, encryptedData);
   return isSame;
 }

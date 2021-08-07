@@ -15,6 +15,7 @@ async function signUp(req, res, next) {
 
   try {
     if (roles) {
+      //TODO: Validar los roles pasados por el usuario
       const dbRoles = await db.Role.find({ name: { $in: roles } });
       roleIds = dbRoles.map((role) => role._id);
     } else {
