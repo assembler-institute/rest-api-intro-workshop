@@ -2,7 +2,8 @@ const express = require("express");
 const helmet = require("helmet");
 const { json } = require("body-parser");
 const morgan = require("morgan");
-const { movieRouter } = require("./routes");
+const { movieRouter, personRouter } = require("./routes");
+
 // express
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(json());
 
 // routes
 app.use("/movies", movieRouter);
+app.use("/persons", personRouter);
 
 // Default routes
 app.get("/", (req, res) => {

@@ -198,15 +198,7 @@ async function postCredits(req, res, next) {
  * @param {*} next
  */
 async function patchCredits(req, res, next) {
-  const { id: movieId } = req.params;
-  const { crew = undefined, cast = undefined } = req.body;
-
-  try {
-    const movie = await db.Movie.findById(movieId);
-  } catch (err) {
-    res.status(400).send({ error: err.message });
-    next(err);
-  }
+  // TODO: as an array of objects
 }
 
 /**

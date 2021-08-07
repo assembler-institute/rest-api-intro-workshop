@@ -13,7 +13,6 @@ movieRouter.patch("/:id", movieController.patchMovie);
 movieRouter.delete("/:id", movieController.deleteMovie);
 
 // Credits requests
-// TODO: consider movieRouter.all("/:id/credits", movieController.);
 movieRouter.get("/:id/credits", movieController.fetchCredits);
 movieRouter.post("/:id/credits", validateCastCrew, movieController.postCredits);
 movieRouter.patch("/:id/credits", movieController.patchCredits);
