@@ -2,7 +2,7 @@ const express = require("express");
 const helmet = require("helmet");
 const { json } = require("body-parser");
 const morgan = require("morgan");
-const { movieRouter, personRouter } = require("./routes");
+const { movieRouter, personRouter, userRouter } = require("./routes");
 
 // express
 const app = express();
@@ -13,7 +13,7 @@ app.use(helmet());
 app.use(json());
 
 // routes
-app.use("/users", movieRouter);
+app.use("/users", userRouter);
 app.use("/movies", movieRouter);
 app.use("/persons", personRouter);
 

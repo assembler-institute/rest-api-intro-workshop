@@ -4,7 +4,8 @@ function getSeedUsers() {
       firstName: "Brahim",
       lastName: "Benalia",
       email: "brahim@brahim.es",
-      password: "123",
+      // Password: 123
+      password: "$2b$10$GVOAlSA4v6h8wteprLFsQuaM9FptKB/DW0L83wGnbClichSY9HP9a",
       roles: ["Admin"],
     },
   ];
