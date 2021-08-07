@@ -93,16 +93,16 @@ async function postPerson(req, res, next) {
  * @param {*} next
  */
 async function patchPerson(req, res, next) {
-  const { id: movieId } = req.params;
+  const { id: personId } = req.params;
 
   try {
-    const movie = await db.Movie.findOneAndUpdate(
-      { _id: movieId },
+    const person = await db.Movie.findOneAndUpdate(
+      { _id: personId },
       { ...req.body },
       { new: true },
     );
 
-    if (!movie) {
+    if (!person) {
       res.status(200).send({ message: "There is no movie with id " + movieId });
       next();
     } else {
@@ -124,19 +124,19 @@ async function patchPerson(req, res, next) {
  * @param {*} next
  */
 async function deletePerson(req, res, next) {
-  const { id: movieId } = req.params;
+  const { id: personId } = req.params;
 
   try {
-    const movie = await db.Movie.findByIdAndDelete(movieId);
+    const person = await db.Person.findByIdAndDelete(personId);
 
-    if (!movie) {
-      res.status(200).send({ message: "Movie not found!" });
+    if (!person) {
+      res.status(200).send({ message: "Person not found!" });
       return;
     }
 
     res.status(200).send({
-      data: movie,
-      message: "Movie deleted successfully!",
+      data: person,
+      message: "Person deleted successfully!",
     });
   } catch (err) {
     res.status(400).send({ error: err.message });
