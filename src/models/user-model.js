@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = require("mongoose");
 const validator = require("validator");
+const db = require("./index");
 
 const userSchema = new Schema(
   {
@@ -24,6 +25,7 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
+      required: [true, "The password is required"],
       unique: true,
     },
     roles: {
@@ -40,7 +42,7 @@ const userSchema = new Schema(
 // Scheme hooks
 userSchema.post("save", function (error, doc, next) {
   if (error.code === 11000 && error.keyPattern.email)
-    next(new Error("email must be unique"));
+    next(new Error("Email already exists!"));
   else next(error);
 });
 

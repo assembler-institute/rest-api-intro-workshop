@@ -9,27 +9,19 @@ const { config } = require("../config");
  * @param {*} res
  * @param {*} next
  */
-async function signUp(req, res, next) {
+async function registerUser(req, res, next) {
   const { email, password, firstName, lastName, roles } = req.body;
-  let roleIds = null;
 
   try {
-    if (roles) {
-      //TODO: Validar los roles pasados por el usuario
-      //TODO: Validar Si ya existe el usuario
-      const dbRoles = await db.Role.find({ name: { $in: roles } });
-      roleIds = dbRoles.map((role) => role._id);
-    } else {
-      const dbRole = await db.Role.findOne({ name: "User" });
-      roleIds = [dbRole._id];
-    }
+    if (!password)
+      return res.status(400).send({ message: "The password is required!" });
 
     const { _id } = await db.User.create({
       email: email,
       password: await encryptPassword(password),
       firstName: firstName,
       lastName: lastName,
-      roles: roleIds,
+      roles: roles,
     });
 
     const token = jwt.sign({ _id }, config.jwt.SECRET, { expiresIn: 86400 });
@@ -151,4 +143,4 @@ async function patchUser(req, res, next) {
   }
 }
 
-module.exports = { signUp, fetchUsers, fetchUserById, patchUser };
+module.exports = { registerUser, fetchUsers, fetchUserById, patchUser };
