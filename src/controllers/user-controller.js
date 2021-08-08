@@ -60,16 +60,23 @@ async function fetchUsers(req, res, next) {
     const skip = (page - 1) * limit;
     const totalPages = Math.ceil(count / limit);
 
-    const users = await db.User.find({})
+    const users = await db.User.find({}, { password: 0 })
       .sort({ title: 1 })
       .skip(skip)
       .limit(limit)
+      .populate("roles")
       .lean();
+
+    const populatedUsers = users.map((user) => {
+      const roles = user.roles.map((role) => role.name);
+      user.roles = roles;
+      return user;
+    });
 
     res.status(200).send({
       page: page,
       total_pages: totalPages,
-      data: users,
+      data: populatedUsers,
     });
   } catch (err) {
     res.status(400).send({ error: err.message });
@@ -90,14 +97,10 @@ async function fetchUserById(req, res, next) {
     const user = await db.User.findById(userId, { password: 0 })
       .populate({
         path: "roles",
-        select: {
-          name: 1,
-          _id: 0,
-        },
       })
       .lean();
 
-    roles = user.roles.map((usr) => usr.name);
+    const roles = user.roles.map((role) => role.name);
     user.roles = roles;
 
     if (!user) return res.status(400).send({ message: "User not found" });
