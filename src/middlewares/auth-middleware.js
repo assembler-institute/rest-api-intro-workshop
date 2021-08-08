@@ -22,7 +22,8 @@ async function checkToken(req, res, next) {
 
     const user = await db.User.findById(req.userId, { password: 0 });
 
-    if (!user) return res.status(404).send({ message: "User not found!" });
+    if (!user)
+      return res.status(404).send({ message: "User token not found!" });
 
     next();
   } catch (error) {
@@ -55,4 +56,5 @@ async function isAdmin(req, res, next) {
     return res.status(400).send({ message: err.message });
   }
 }
+
 module.exports = { checkToken, isAdmin };

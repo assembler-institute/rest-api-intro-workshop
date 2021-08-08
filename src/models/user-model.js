@@ -37,6 +37,13 @@ const userSchema = new Schema(
   },
 );
 
+// Scheme hooks
+userSchema.post("save", function (error, doc, next) {
+  if (error.code === 11000 && error.keyPattern.email)
+    next(new Error("email must be unique"));
+  else next(error);
+});
+
 const User = mongoose.model("user", userSchema);
 
 module.exports = User;
