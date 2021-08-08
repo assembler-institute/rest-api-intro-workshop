@@ -12,8 +12,8 @@ const userRouter = Router();
 userRouter.post("/signin", authController.signIn);
 userRouter.post("/signup", [checkToken, isAdmin], userController.signUp);
 userRouter.get("/", [checkToken, isAdmin], userController.fetchUsers);
-userRouter.get("/:id", userController.fetchUserById);
-// userRouter.patch("/:id", userController.patchPerson);
+userRouter.get("/:id", [checkToken, isAdmin], userController.fetchUserById);
+userRouter.patch("/:id", [checkToken, isAdmin], userController.patchUser);
 // userRouter.delete("/:id", userController.deletePerson);
 
 module.exports = {

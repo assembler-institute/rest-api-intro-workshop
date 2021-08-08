@@ -100,10 +100,10 @@ async function fetchUserById(req, res, next) {
       })
       .lean();
 
+    if (!user) return res.status(400).send({ message: "User not found" });
+
     const roles = user.roles.map((role) => role.name);
     user.roles = roles;
-
-    if (!user) return res.status(400).send({ message: "User not found" });
 
     res.status(200).send(user);
   } catch (err) {
@@ -111,4 +111,43 @@ async function fetchUserById(req, res, next) {
     next(err);
   }
 }
-module.exports = { signUp, fetchUsers, fetchUserById };
+
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+async function patchUser(req, res, next) {
+  const { id: userId } = req.params;
+  const { roles } = req.body;
+
+  try {
+    if (roles) {
+      const dbRoles = await db.Role.find({ name: { $in: roles } });
+      req.body.roles = dbRoles.map((role) => role._id);
+      req.body.roleNames = dbRoles.map((role) => role.name);
+    }
+
+    const user = await db.User.findOneAndUpdate(
+      { _id: userId },
+      { ...req.body },
+      { new: true },
+    );
+
+    if (!user) return res.status(400).send({ message: `User not found` });
+
+    req.body.roles = req.body.roleNames;
+    delete req.body.roleNames;
+
+    res.status(200).send({
+      message: "User updated successfully!",
+      data: req.body,
+    });
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+    next(err);
+  }
+}
+
+module.exports = { signUp, fetchUsers, fetchUserById, patchUser };
