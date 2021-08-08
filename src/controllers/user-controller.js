@@ -44,4 +44,68 @@ async function signUp(req, res, next) {
   }
 }
 
-module.exports = { signUp };
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+async function fetchUsers(req, res, next) {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 5;
+
+  try {
+    const count = await db.User.countDocuments();
+
+    const skip = (page - 1) * limit;
+    const totalPages = Math.ceil(count / limit);
+
+    const users = await db.User.find({})
+      .sort({ title: 1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    res.status(200).send({
+      page: page,
+      total_pages: totalPages,
+      data: users,
+    });
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+    next(err);
+  }
+}
+
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+async function fetchUserById(req, res, next) {
+  const { id: userId } = req.params;
+
+  try {
+    const user = await db.User.findById(userId, { password: 0 })
+      .populate({
+        path: "roles",
+        select: {
+          name: 1,
+          _id: 0,
+        },
+      })
+      .lean();
+
+    roles = user.roles.map((usr) => usr.name);
+    user.roles = roles;
+
+    if (!user) return res.status(400).send({ message: "User not found" });
+
+    res.status(200).send(user);
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+    next(err);
+  }
+}
+module.exports = { signUp, fetchUsers, fetchUserById };
