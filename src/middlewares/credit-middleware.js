@@ -18,7 +18,8 @@ async function validateCastCrew(req, res, next) {
       });
       if (!cr) {
         res.status(400).send({
-          msg: "crew not found in Person collection! Must be a director or a composer",
+          message:
+            "crew not found in Person collection! Must be a director or a composer",
         });
         return;
       }
@@ -28,13 +29,15 @@ async function validateCastCrew(req, res, next) {
     if (cast) {
       const ct = await db.Person.findOne({ _id: cast, roles: "Actor" });
       if (!ct) {
-        res.status(400).send({ msg: "Actor not found in Person collection!" });
+        res
+          .status(400)
+          .send({ message: "Actor not found in Person collection!" });
         return;
       }
     }
     next();
   } catch (error) {
-    res.status(400).send({ msg: "Invalid id" });
+    res.status(400).send({ message: "Invalid id" });
   }
 }
 
