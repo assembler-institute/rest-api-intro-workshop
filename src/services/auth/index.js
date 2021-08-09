@@ -4,6 +4,6 @@ const { generateAccessToken } = require("./generate-access-token");
 
 module.exports = {
   generateAccessToken,
-  getAuthToken: getAuthToken,
-  verifyAuthToken: verifyAuthToken,
+  getAuthToken,
+  verifyAuthToken,
 };

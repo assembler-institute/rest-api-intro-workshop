@@ -1,5 +1,4 @@
 const db = require("../models");
-const jwt = require("jsonwebtoken");
 const { encryptPassword } = require("../utils/encrypt");
 const { config } = require("../config");
 
@@ -24,12 +23,10 @@ async function registerUser(req, res, next) {
       roles: roles,
     });
 
-    // const token = jwt.sign({ _id }, config.jwt.SECRET, { expiresIn: 86400 });
-
     return res.status(200).send({
+      message: "User created successfully!",
       id: _id,
       email,
-      token,
     });
   } catch (err) {
     res.status(400).send({ message: err.message });

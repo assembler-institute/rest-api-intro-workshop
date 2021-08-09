@@ -1,6 +1,5 @@
-const jwt = require("jsonwebtoken");
 const db = require("../models");
-const { config } = require("../config");
+const { getAuthToken, verifyAuthToken } = require("../services/auth");
 
 /**
  *
@@ -9,25 +8,19 @@ const { config } = require("../config");
  * @param {*} next
  */
 async function checkToken(req, res, next) {
-  const token = req.headers["x-access-token"];
-
   try {
-    if (!token)
-      return res
-        .status(403)
-        .send({ message: "You need a token, please register!" });
+    const bearerToken = await getAuthToken(req.headers);
+    const { email } = await verifyAuthToken(bearerToken);
 
-    const decoded = jwt.verify(token, config.jwt.SECRET);
-    req.userId = decoded._id;
-
-    const user = await db.User.findById(req.userId, { password: 0 });
+    const user = await db.User.findOne({ email }, { password: 0 });
 
     if (!user)
       return res.status(404).send({ message: "User token not found!" });
 
     next();
-  } catch (error) {
-    return res.status(403).send({ message: "unauthorized!" });
+  } catch (err) {
+    res.status(403).send({ message: err.message });
+    next(err);
   }
 }
 

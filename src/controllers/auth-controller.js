@@ -1,7 +1,8 @@
 const db = require("../models");
-const jwt = require("jsonwebtoken");
+const randToken = require("rand-token");
 const { comparePassword } = require("../utils/encrypt");
-const { config } = require("../config");
+const { generateAccessToken } = require("../services/auth");
+const { session } = require("../session");
 
 /**
  *
@@ -14,20 +15,21 @@ async function signIn(req, res, next) {
 
   try {
     const user = await db.User.findOne({ email });
-
     if (!user) return res.status(400).send({ message: "User not registered!" });
 
     const pass = await comparePassword(password, user.password);
-
     if (!pass)
       return res.status(401).send({ message: "Invalid email or password!" });
 
-    const { _id } = user;
-    const token = jwt.sign({ _id }, config.jwt.SECRET, { expiresIn: 86400 });
+    const accessToken = generateAccessToken(email);
+    const refreshToken = randToken.uid(256);
+
+    session.refreshTokens[refreshToken] = email;
 
     return res.status(200).send({
       email,
-      token,
+      accessToken,
+      refreshToken,
     });
   } catch (err) {
     res.status(400).send({ message: err.message });
