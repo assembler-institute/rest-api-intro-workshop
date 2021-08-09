@@ -17,6 +17,7 @@ async function checkToken(req, res, next) {
     if (!user)
       return res.status(404).send({ message: "User token not found!" });
 
+    req.userEmail = email;
     next();
   } catch (err) {
     res.status(403).send({ message: err.message });
@@ -31,11 +32,11 @@ async function checkToken(req, res, next) {
  * @param {*} next
  */
 async function isAdmin(req, res, next) {
-  const { userId } = req;
+  const { userEmail } = req;
 
   try {
     const user = await db.User.findOne(
-      { _id: userId },
+      { email: userEmail },
       { password: 0 },
     ).populate({
       path: "roles",
@@ -46,7 +47,8 @@ async function isAdmin(req, res, next) {
       return res.status(400).send({ message: "Must be an admin" });
     else next();
   } catch (err) {
-    return res.status(400).send({ message: err.message });
+    res.status(400).send({ message: err.message });
+    next(err);
   }
 }
 

@@ -110,15 +110,8 @@ async function fetchUserById(req, res, next) {
  */
 async function patchUser(req, res, next) {
   const { id: userId } = req.params;
-  const { roles } = req.body;
 
   try {
-    if (roles) {
-      const dbRoles = await db.Role.find({ name: { $in: roles } });
-      req.body.roles = dbRoles.map((role) => role._id);
-      req.body.roleNames = dbRoles.map((role) => role.name);
-    }
-
     const user = await db.User.findOneAndUpdate(
       { _id: userId },
       { ...req.body },
@@ -127,8 +120,7 @@ async function patchUser(req, res, next) {
 
     if (!user) return res.status(400).send({ message: `User not found` });
 
-    req.body.roles = req.body.roleNames;
-    delete req.body.roleNames;
+    req.body.roles = req.rolesNames;
 
     res.status(200).send({
       message: "User updated successfully!",
@@ -152,7 +144,9 @@ async function deleteUser(req, res, next) {
   const { id: userId } = req.params;
 
   try {
-    const user = await db.User.findByIdAndDelete(userId);
+    const user = await db.User.findByIdAndDelete(userId).select({
+      password: 0,
+    });
 
     if (!user) {
       res.status(400).send({ message: "User not found!" });

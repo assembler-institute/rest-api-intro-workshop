@@ -16,6 +16,8 @@ async function validateRoles(req, res, next) {
         if (dbRole) return dbRole._id;
       });
 
+      // req.body.rolesNames = req.body.roles.map((role) => role);
+      req.rolesNames = req.body.roles;
       req.body.roles = await Promise.all(dbRoles);
 
       const i = req.body.roles.findIndex((role) => !role);
