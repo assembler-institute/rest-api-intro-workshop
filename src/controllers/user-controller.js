@@ -132,8 +132,6 @@ async function patchUser(req, res, next) {
   }
 }
 
-// TODO: virtuals para formatear la fecha
-
 /**
  *
  * @param {*} req

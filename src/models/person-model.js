@@ -39,14 +39,9 @@ const personSchema = new Schema(
   },
 );
 
-personSchema
-  .virtual("birthDate")
-  .set((date) => {
-    this.birthDateISO = new Date(date);
-  })
-  .get(() => {
-    return this.birthDateISO.toISOString().substring(0, 10);
-  });
+personSchema.virtual("birthDate").get(function () {
+  return this.birthDateISO.toISOString().substring(0, 10);
+});
 
 const Person = mongoose.model("person", personSchema);
 

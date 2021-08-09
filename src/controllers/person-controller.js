@@ -20,13 +20,24 @@ async function fetchPersons(req, res, next) {
     const persons = await db.Person.find({})
       .sort({ title: 1 })
       .skip(skip)
-      .limit(limit)
-      .lean();
+      .limit(limit);
+
+    const personsFormatted = persons.map((person) => {
+      return {
+        roles: person.roles,
+        _id: person._id,
+        name: person.name,
+        birthDate: person.birthDate,
+        birthPlace: person.birthPlace,
+        createdAt: person.createdAt,
+        updatedAt: person.updatedAt,
+      };
+    });
 
     res.status(200).send({
       page: page,
       total_pages: totalPages,
-      data: persons,
+      data: personsFormatted,
     });
   } catch (err) {
     res.status(400).send({ error: err.message });
@@ -44,14 +55,24 @@ async function fetchPersonById(req, res, next) {
   const { id: personId } = req.params;
 
   try {
-    const person = await db.Person.findById(personId).lean();
+    const person = await db.Person.findById(personId);
 
     if (!person) {
       res.status(400).send({ message: "Person not found" });
       return;
     }
 
-    res.status(200).send({ data: person });
+    res.status(200).send({
+      data: {
+        roles: person.roles,
+        _id: person._id,
+        name: person.name,
+        birthDate: person.birthDate,
+        birthPlace: person.birthPlace,
+        createdAt: person.createdAt,
+        updatedAt: person.updatedAt,
+      },
+    });
   } catch (err) {
     res.status(400).send({ error: err.message });
     next(err);
@@ -117,8 +138,6 @@ async function patchPerson(req, res, next) {
     next(err);
   }
 }
-
-// TODO: delete person debe borrar las ids de cast y crew
 
 /**
  *

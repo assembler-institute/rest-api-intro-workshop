@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const express = require("express");
 const helmet = require("helmet");
 const { json } = require("body-parser");
@@ -9,6 +10,7 @@ const { authMiddleware } = require("./middlewares");
 const app = express();
 
 // middleware
+mongoose.set("toJSON", { virtuals: true });
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(json());
