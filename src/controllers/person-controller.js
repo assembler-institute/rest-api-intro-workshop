@@ -1,4 +1,5 @@
 const db = require("../models");
+const { startSession } = require("mongoose");
 
 /**
  *
@@ -129,7 +130,19 @@ async function deletePerson(req, res, next) {
   const { id: personId } = req.params;
 
   try {
+    const session = await startSession();
+
+    // Start transaction
+    session.startTransaction();
     const person = await db.Person.findByIdAndDelete(personId);
+    await db.Movie.findOneAndUpdate(
+      {},
+      { $pull: { crew: personId, cast: personId } },
+    );
+
+    // End transaction
+    await session.commitTransaction();
+    session.endSession();
 
     if (!person) {
       res.status(400).send({ message: "Person not found!" });
@@ -141,6 +154,8 @@ async function deletePerson(req, res, next) {
       data: person,
     });
   } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
     res.status(400).send({ error: err.message });
     next(err);
   }

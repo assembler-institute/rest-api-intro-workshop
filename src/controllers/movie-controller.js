@@ -20,6 +20,14 @@ async function fetchMovies(req, res, next) {
       .sort({ title: 1 })
       .skip(skip)
       .limit(limit)
+      .populate({
+        path: "cast",
+        select: { name: 1 },
+      })
+      .populate({
+        path: "crew",
+        select: { name: 1 },
+      })
       .lean();
 
     res.status(200).send({
