@@ -8,7 +8,7 @@ const personSchema = new Schema(
       unique: true,
       trim: true,
     },
-    birthDate: {
+    birthDateISO: {
       type: Date,
       required: [true, "birth date is required"],
     },
@@ -39,10 +39,14 @@ const personSchema = new Schema(
   },
 );
 
-// TODO: un virtual para formatear la fecha que se manda al usuario
-
-// TODO: se podria hacer un descriminator para heredar de un
-// TODO: esquema padre que contiene todos esos virtuales
+personSchema
+  .virtual("birthDate")
+  .set((date) => {
+    this.birthDateISO = new Date(date);
+  })
+  .get(() => {
+    return this.birthDateISO.toISOString().substring(0, 10);
+  });
 
 const Person = mongoose.model("person", personSchema);
 

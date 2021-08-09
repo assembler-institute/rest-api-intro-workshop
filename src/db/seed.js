@@ -4,9 +4,26 @@ const { getSeedPersons } = require("./data-person");
 const { getSeedUsers } = require("./data-user");
 
 async function seedMovies() {
-  const movies = [...getSeedMovies()].map((movie) => ({ ...movie }));
+  // const movies = [...getSeedMovies()].map((movie) => ({ ...movie }));
+  // await db.Movie.deleteMany({});
+  // await db.Movie.create([...movies]);
+
+  const movies = [...getSeedMovies()].map(async (movie) => {
+    const castIds = await db.Person.find({ name: { $in: movie.cast } });
+    const crewIds = await db.Person.find({ name: { $in: movie.crew } });
+
+    const idsCs = castIds.map((castId) => castId._id);
+    const idsCr = crewIds.map((crewId) => crewId._id);
+
+    movie.cast = idsCs;
+    movie.crew = idsCr;
+    return movie;
+  });
+
+  const results = await Promise.all(movies);
+
   await db.Movie.deleteMany({});
-  await db.Movie.create([...movies]);
+  await db.Movie.create([...results]);
 }
 
 async function seedPersons() {

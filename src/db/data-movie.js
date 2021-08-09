@@ -5,102 +5,56 @@ function getSeedMovies() {
       releaseYear: 1994,
       duration: 142,
       genres: ["Drama"],
-      cast: [
-        { _id: "610c1df54bf6061324eee9cb" },
-        { _id: "610c1df54bf6061324eee9cc" },
-        { _id: "610c1df54bf6061324eee9d0" },
-      ],
-      crew: [
-        { _id: "610c1df54bf6061324eee9d3" },
-        { _id: "610c1df54bf6061324eee9d9" },
-      ],
+      cast: ["Keanu Reeves", "Leonardo DiCaprio", "Johnny Depp"],
+      crew: ["Steven Spielberg", "Rachel Portman"],
     },
     {
       title: "The Green Mile",
       releaseYear: 1999,
       duration: 188,
       genres: ["Drama", "Fantasy"],
-      cast: [
-        { _id: "610c1df54bf6061324eee9cd" },
-        { _id: "610c1df54bf6061324eee9ce" },
-        { _id: "610c1df54bf6061324eee9d1" },
-      ],
-      crew: [
-        { _id: "610c1df54bf6061324eee9d4" },
-        { _id: "610c1df54bf6061324eee9d8" },
-      ],
+      cast: ["Tom Cruise", "Will Smith", "Robert Downey Jr."],
+      crew: ["John Williams", "Alfred Hitchcock"],
     },
     {
       title: "Saving Private Ryan",
       releaseYear: 1998,
       duration: 169,
       genres: ["Drama", "Historical"],
-      cast: [
-        { _id: "610c1df54bf6061324eee9d0" },
-        { _id: "610c1df54bf6061324eee9cf" },
-      ],
-      crew: [
-        { _id: "610c1df54bf6061324eee9d5" },
-        { _id: "610c1df54bf6061324eee9d7" },
-      ],
+      cast: ["Haley Bennett", "Zoe Perry", "Robert Downey Jr."],
+      crew: ["Stanley Kubrick", "Javier Navarrete"],
     },
     {
       title: "Forrest Gump",
       releaseYear: 1994,
       duration: 142,
       genres: ["Comedy", "Drama"],
-      cast: [
-        { _id: "610c1df54bf6061324eee9d1" },
-        { _id: "610c1df54bf6061324eee9d2" },
-        { _id: "610c1df54bf6061324eee9cd" },
-      ],
-      crew: [
-        { _id: "610c1df54bf6061324eee9d6" },
-        { _id: "610c1df54bf6061324eee9da" },
-      ],
+      cast: ["Will Smith", "Tom Cruise", "Zoe Perry"],
+      crew: ["Rachel Portman OBE", "Quentin Tarantino"],
     },
     {
       title: "Fight Club",
       releaseYear: 1999,
       duration: 139,
       genres: ["Drama"],
-      cast: [
-        { _id: "610c1df54bf6061324eee9cb" },
-        { _id: "610c1df54bf6061324eee9cc" },
-      ],
-      crew: [
-        { _id: "610c1df54bf6061324eee9d3" },
-        { _id: "610c1df54bf6061324eee9d9" },
-      ],
+      cast: ["Keanu Reeves", "Zoe Perry", "Will Smith"],
+      crew: ["Rachel Portman OBE", "Javier Navarrete", "Quentin Tarantino"],
     },
     {
       title: "The Notebook",
       releaseYear: 2004,
       duration: 154,
       genres: ["Romance"],
-      cast: [
-        { _id: "610c1df54bf6061324eee9cd" },
-        { _id: "610c1df54bf6061324eee9ce" },
-      ],
-      crew: [
-        { _id: "610c1df54bf6061324eee9d4" },
-        { _id: "610c1df54bf6061324eee9d8" },
-      ],
+      cast: ["Haley Bennett", "Leonardo DiCaprio", "Johnny Depp"],
+      crew: ["Stanley Kubrick", "Alfred Hitchcock"],
     },
     {
       title: "Dilwale Dulhania Le Jayenge",
       releaseYear: 1995,
       duration: 109,
       genres: ["Western"],
-      cast: [
-        { _id: "610c1df54bf6061324eee9cf" },
-        { _id: "610c1df54bf6061324eee9d0" },
-        { _id: "610c1df54bf6061324eee9cb" },
-      ],
-      crew: [
-        { _id: "610c1df54bf6061324eee9d5" },
-        { _id: "610c1df54bf6061324eee9d7" },
-      ],
+      cast: ["Robert Downey Jr.", "Will Smith", "Johnny Depp"],
+      crew: ["Rachel Portman", "Quentin Tarantino", "Steven Spielberg"],
     },
   ];
 }

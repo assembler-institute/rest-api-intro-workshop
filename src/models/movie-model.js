@@ -55,7 +55,6 @@ const movieSchema = new Schema(
     crew: {
       type: [mongoose.SchemaTypes.ObjectId],
       required: true,
-      unique: true,
       ref: "person",
       validate: {
         validator: (v) => v.length > 0,
