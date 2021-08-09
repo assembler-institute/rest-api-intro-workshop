@@ -24,7 +24,7 @@ async function registerUser(req, res, next) {
       roles: roles,
     });
 
-    const token = jwt.sign({ _id }, config.jwt.SECRET, { expiresIn: 86400 });
+    // const token = jwt.sign({ _id }, config.jwt.SECRET, { expiresIn: 86400 });
 
     return res.status(200).send({
       id: _id,
