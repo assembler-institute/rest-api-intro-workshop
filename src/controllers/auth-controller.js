@@ -37,4 +37,34 @@ async function signIn(req, res, next) {
   }
 }
 
-module.exports = { signIn };
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+async function updateAccessToken(req, res, next) {
+  const { email, refreshToken } = req.body;
+
+  try {
+    if (!email || !refreshToken)
+      res.status(400).send({ message: "Email and refresh token are required" });
+
+    if (
+      refreshToken in session.refreshTokens &&
+      session.refreshTokens[refreshToken] == email
+    ) {
+      const accessToken = generateAccessToken(email);
+
+      if (accessToken)
+        return res.status(200).send({ accessToken, refreshToken });
+    }
+
+    res.status(400).send({ message: "Can't generate your access token" });
+  } catch (err) {
+    res.status(400).send({ message: err.message });
+    next(err);
+  }
+}
+
+module.exports = { signIn, updateAccessToken };
