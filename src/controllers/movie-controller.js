@@ -155,8 +155,14 @@ async function fetchCredits(req, res, next) {
 
   try {
     const credits = await db.Movie.findById(movieId)
-      .populate("cast")
-      .populate("crew");
+      .populate({
+        path: "cast",
+        select: { name: 1 },
+      })
+      .populate({
+        path: "crew",
+        select: { name: 1 },
+      });
 
     res.status(200).send({ data: credits });
   } catch (err) {
@@ -180,7 +186,15 @@ async function postCredits(req, res, next) {
       { _id: movieId },
       { $addToSet: { crew: crew, cast: cast } },
       { new: true, omitUndefined: true },
-    );
+    )
+      .populate({
+        path: "cast",
+        select: { name: 1 },
+      })
+      .populate({
+        path: "crew",
+        select: { name: 1 },
+      });
 
     if (!movie) {
       res.status(400).send({ message: "Credit id not found!" });
@@ -216,7 +230,6 @@ async function deleteCredits(req, res, next) {
   const { id: movieId, creditId } = req.params;
 
   try {
-    // TODO: $pull borra un elemento de un array
     const movie = await db.Movie.findById(movieId);
 
     if (!movie) {
@@ -224,20 +237,27 @@ async function deleteCredits(req, res, next) {
       return;
     }
 
-    const updatedCrews = movie.crew.filter((id) => id != creditId);
-    const updatedCasts = movie.cast.filter((id) => id != creditId);
+    const updatedMovie = await db.Movie.findOneAndUpdate(
+      { _id: movieId },
+      { $pull: { crew: creditId, cast: creditId } },
+      { new: true },
+    )
+      .populate({
+        path: "cast",
+        select: { name: 1 },
+      })
+      .populate({
+        path: "crew",
+        select: { name: 1 },
+      });
 
     if (
-      updatedCrews.length == movie.crew.length &&
-      updatedCasts.length == movie.cast.length
+      updatedMovie.cast.length === movie.cast.length &&
+      updatedMovie.crew.length === movie.crew.length
     ) {
       res.status(400).send({ message: "Crew / Cast not found!" });
       return;
     }
-
-    movie.crew = updatedCrews;
-    movie.cast = updatedCasts;
-    const updatedMovie = await movie.save();
 
     res.status(200).send({
       message: "Crew / Cast deleted successfully!",
