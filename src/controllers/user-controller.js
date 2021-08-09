@@ -143,4 +143,39 @@ async function patchUser(req, res, next) {
   }
 }
 
-module.exports = { registerUser, fetchUsers, fetchUserById, patchUser };
+// TODO: virtuals para formatear la fecha
+
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+async function deleteUser(req, res, next) {
+  const { id: userId } = req.params;
+
+  try {
+    const user = await db.User.findByIdAndDelete(userId);
+
+    if (!user) {
+      res.status(400).send({ message: "User not found!" });
+      return;
+    }
+
+    res.status(200).send({
+      message: "User deleted successfully!",
+      data: user,
+    });
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+    next(err);
+  }
+}
+
+module.exports = {
+  registerUser,
+  fetchUsers,
+  fetchUserById,
+  patchUser,
+  deleteUser,
+};

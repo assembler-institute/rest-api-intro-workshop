@@ -117,6 +117,8 @@ async function patchPerson(req, res, next) {
   }
 }
 
+// TODO: delete person debe borrar las ids de cast y crew
+
 /**
  *
  * @param {*} req

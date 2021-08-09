@@ -216,6 +216,7 @@ async function deleteCredits(req, res, next) {
   const { id: movieId, creditId } = req.params;
 
   try {
+    // TODO: $pull borra un elemento de un array
     const movie = await db.Movie.findById(movieId);
 
     if (!movie) {
