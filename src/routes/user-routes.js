@@ -28,6 +28,7 @@ userRouter.post(
   userController.registerUser,
 );
 userRouter.post("/refresh-token", authController.updateAccessToken);
+userRouter.post("/sign-out", authController.rejectToken);
 
 module.exports = {
   userRouter,

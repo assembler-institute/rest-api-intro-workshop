@@ -60,11 +60,36 @@ async function updateAccessToken(req, res, next) {
         return res.status(200).send({ accessToken, refreshToken });
     }
 
-    res.status(400).send({ message: "Can't generate your access token" });
+    res.status(500).send({ message: "Can't generate your access token" });
   } catch (err) {
     res.status(400).send({ message: err.message });
     next(err);
   }
 }
 
-module.exports = { signIn, updateAccessToken };
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+async function rejectToken(req, res, next) {
+  const { refreshToken } = req.body;
+
+  try {
+    if (!refreshToken)
+      return res.status(400).send({ message: "Param refreshToken required" });
+
+    if (refreshToken in session.refreshTokens) {
+      delete session.refreshTokens[refreshToken];
+      return res.status(200).send({ message: "Goodbye!" });
+    }
+
+    return res.status(501).send({ error: "refresh token not found!" });
+  } catch (err) {
+    res.status(400).send({ message: err.message });
+    next(err);
+  }
+}
+
+module.exports = { signIn, updateAccessToken, rejectToken };
