@@ -1,8 +1,8 @@
 const Router = require("express").Router;
 
-const { userController, authController } = require("../controllers");
+const { userController } = require("../controllers");
 const {
-  authMiddleware: { checkToken, isAdmin },
+  authMiddleware: { checkTokenFirebase, isAdmin },
   userMiddleware: { validateRoles },
 } = require("../middlewares");
 
@@ -10,25 +10,37 @@ const userRouter = Router();
 
 // ---
 // User requests
-userRouter.get("/", [checkToken, isAdmin], userController.fetchUsers);
-userRouter.get("/:id", [checkToken, isAdmin], userController.fetchUserById);
+userRouter.get("/", [checkTokenFirebase, isAdmin], userController.fetchUsers);
+userRouter.get(
+  "/:id",
+  [checkTokenFirebase, isAdmin],
+  userController.fetchUserById,
+);
 userRouter.patch(
   "/:id",
-  [checkToken, isAdmin, validateRoles],
+  [checkTokenFirebase, isAdmin, validateRoles],
   userController.patchUser,
 );
-userRouter.delete("/:id", [checkToken, isAdmin], userController.deleteUser);
+userRouter.delete(
+  "/:id",
+  [checkTokenFirebase, isAdmin],
+  userController.deleteUser,
+);
 
 // ---
 // Account requests
-userRouter.post("/signin", authController.signIn);
 userRouter.post(
-  "/signup",
-  [checkToken, isAdmin, validateRoles],
-  userController.registerUser,
+  "/sign-in",
+  [checkTokenFirebase, validateRoles],
+  userController.signIn,
 );
-userRouter.post("/refresh-token", authController.updateAccessToken);
-userRouter.post("/sign-out", authController.rejectToken);
+// userRouter.post(
+//   "/sign-up",
+//   [checkTokenFirebase, isAdmin, validateRoles],
+//   userController.registerUser,
+// );
+// userRouter.post("/refresh-token", authController.updateAccessToken);
+// userRouter.post("/sign-out", authController.rejectToken);
 
 module.exports = {
   userRouter,

@@ -23,11 +23,6 @@ const userSchema = new Schema(
         message: (props) => `The email ${props.value} is not valid`,
       },
     },
-    password: {
-      type: String,
-      required: [true, "The password is required"],
-      unique: true,
-    },
     roles: {
       type: [mongoose.SchemaTypes.ObjectId],
       ref: "role",

@@ -1,5 +1,6 @@
 const db = require("../models");
 const { getAuthToken, verifyAuthToken } = require("../services/auth");
+const { verifyFirebaseIdToken } = require("../services/firebase");
 
 /**
  *
@@ -18,6 +19,31 @@ async function checkToken(req, res, next) {
       return res.status(404).send({ message: "User token not found!" });
 
     req.userEmail = email;
+    next();
+  } catch (err) {
+    res.status(403).send({ message: err.message });
+    next(err);
+  }
+}
+
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+async function checkTokenFirebase(req, res, next) {
+  try {
+    const bearerToken = await getAuthToken(req.headers);
+
+    const userClaims = await verifyFirebaseIdToken(bearerToken);
+
+    const { email, uid } = userClaims;
+    req.user = {
+      email: email,
+      uid: uid,
+    };
+
     next();
   } catch (err) {
     res.status(403).send({ message: err.message });
@@ -52,4 +78,4 @@ async function isAdmin(req, res, next) {
   }
 }
 
-module.exports = { checkToken, isAdmin };
+module.exports = { checkToken, isAdmin, checkTokenFirebase };

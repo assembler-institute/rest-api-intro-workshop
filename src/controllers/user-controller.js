@@ -8,26 +8,21 @@ const { config } = require("../config");
  * @param {*} res
  * @param {*} next
  */
-async function registerUser(req, res, next) {
-  const { email, password, firstName, lastName, roles } = req.body;
+async function signIn(req, res, next) {
+  const { uid, email } = req.user;
 
   try {
-    if (!password)
-      return res.status(400).send({ message: "The password is required!" });
+    const response = await db.User.findOne({ email: email });
 
-    const { _id } = await db.User.create({
+    if (response) return res.status(200).send({ email });
+
+    await db.User.create({
+      firebase_id: uid,
       email: email,
-      password: await encryptPassword(password),
-      firstName: firstName,
-      lastName: lastName,
-      roles: roles,
+      roles: req.body.roles,
     });
 
-    return res.status(200).send({
-      message: "User created successfully!",
-      id: _id,
-      email,
-    });
+    if (response) return res.status(200).send({ email });
   } catch (err) {
     res.status(400).send({ message: err.message });
     next(err);
@@ -162,7 +157,7 @@ async function deleteUser(req, res, next) {
 }
 
 module.exports = {
-  registerUser,
+  signIn,
   fetchUsers,
   fetchUserById,
   patchUser,
