@@ -38,11 +38,8 @@ const movieSchema = new Schema(
       },
     },
     duration: {
-      //TODO: add a getter to convert it
       type: Number, // seconds
     },
-
-    // TODO: Manage Repeated properties
     cast: {
       type: [mongoose.SchemaTypes.ObjectId],
       required: true,
