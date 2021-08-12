@@ -1,9 +1,9 @@
-const movieController = require("./movie-controller");
 const userController = require("./user-controller");
-const authController = require("./auth-controller");
+const moviesController = require("./movies-controller");
+const personsController = require("./persons-controllers");
 
-module.exports = {
-  authController: authController,
-  userController: userController,
-  movieController: movieController,
+module.exports={
+    userController:userController,
+    moviesController:moviesController,
+    personsController:personsController
 };

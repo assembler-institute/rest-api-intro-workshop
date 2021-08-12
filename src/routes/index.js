@@ -1,9 +1,10 @@
-const { userRouter } = require("./user-routes");
-const { movieRouter } = require("./movie-routes");
-const { accountRouter } = require("./account-routes");
+const userRouter = require("./user-route");
+const movieRouter = require("./movie-route");
+const personRouter = require("./persons-route");
 
-module.exports = {
-  accountRouter,
-  userRouter,
-  movieRouter,
-};
+
+module.exports={
+    userRouter:userRouter,
+    movieRouter:movieRouter,
+    personRouter:personRouter 
+}

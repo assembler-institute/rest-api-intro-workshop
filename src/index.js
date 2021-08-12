@@ -1,17 +1,16 @@
 const app = require("./server");
-const { config } = require("./config");
-const connect = require("./db/connect");
+const  config  = require("./config");
+const connect = require("./db");
+// const { urlencoded } = require("body-parser");
 
-// uncomment if you need to seed the database before
-// const { seedMovies } = require("./db/seed");
+// app.set('tokken_key', config.accessToken.tokkenKey);
+// app.use(urlencoded({ extended: true }));
 
-connect().then(async function onServerInit() {
-  config.logger.info(`DB connected`);
+connect().then(async ()=>{
+    //config.logger.info("DB connected!");
+    app.listen(config.app.port,()=>{
+        console.log(`Server running at port ${config.app.port}`)
+    })
 
-  // uncomment if you need to seed the database before
-  // await seedMovies();
-
-  app.listen(config.app.PORT, () => {
-    config.logger.info(`Server running at http://localhost:${config.app.PORT}`);
-  });
 });
+

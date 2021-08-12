@@ -1,114 +1,162 @@
 const db = require("../models");
-const { encryptString } = require("../utils/encrypt");
+const { generateTokken } = require("../services/auth/generate-tokken")
+//const jwt = require('jsonwebtoken');
+//const  config  = require("../config");
+const { sessionData } = require("../session/session");
+const randTokken = require("rand-token");
 
-async function signUp(req, res, next) {
-  const { email, password, firstName, lastName } = req.body;
 
-  try {
-    const encryptedPassword = await encryptString(password);
-    const { _id } = await db.User.create({
-      email: email,
-      password: encryptedPassword,
-      firstName: firstName,
-      lastName: lastName,
-      active: true,
+
+async function register(req,res){
+    
+    const {firstName,lastName,email, password}=req.body;
+    try{
+    
+    const{_id} = await db.User.create({
+            firstName:firstName,
+            lastName:lastName,
+            email:email,
+            password:await db.User.encryptPassword(password),
     });
+
+
 
     return res.status(200).send({
-      id: _id,
-      email,
-    });
-  } catch (err) {
-    console.log(err);
-    next(err);
-  }
-}
-
-async function fetchUsers(req, res, next) {
-  try {
-    const users = await db.User.find().lean();
-
-    res.status(200).send({
-      data: users,
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function fetchUserById(req, res, next) {
-  const {
-    params: { id: userId },
-  } = req;
-
-  try {
-    const user = await db.User.findById(userId).lean();
-
-    res.status(200).send({
-      data: user,
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function updateUser(req, res, next) {
-  const { id: userId } = req.params;
-  const { firstName, lastName } = req.body;
-
-  try {
-    const updatedUser = await db.User.findOneAndUpdate(
-      {
-        _id: userId,
-      },
-      {
-        $set: {
-          firstName: firstName,
-          lastName: lastName,
-        },
-      },
-      {
-        new: true,
-      },
-    ).select({
-      firstName: 1,
-      lastName: 1,
-    });
-
-    res.status(200).send({
-      data: updatedUser,
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function deleteUser(req, res, next) {
-  const { id: userId } = req.params;
-
-  try {
-    const result = await db.User.deleteOne({
-      _id: userId,
-    }).lean();
-
-    if (result.ok === 1 && result.deletedCount === 1) {
-      res.status(200).send({
-        data: "User removed",
-      });
-    } else {
-      res.status(500).send({
-        data: "User not removed",
-      });
+        message:"user created",
+        data:{
+            id:_id
+        }
+    })
+    }catch(err){
+        return res.status(500).send({
+            error:err.message,
+        })
     }
-  } catch (error) {
-    next(error);
-  }
+
 }
 
-module.exports = {
-  signUp: signUp,
-  fetchUsers: fetchUsers,
-  fetchUserById: fetchUserById,
-  updateUser: updateUser,
-  deleteUser: deleteUser,
+async function refreshTokken(req, res, next){
+    const { email,refreshTokken }=req.body;
+    try{
+        if(refreshTokken in sessionData.refreshTokens && 
+            sessionData.refreshTokens[refreshTokken]===email
+            ){
+            const accessTokken = generateTokken({email:email});
+            return res.status(200).send({
+                accessTokken:accessTokken,
+                refreshTokken:refreshTokken,
+                message:`Welcome ${email}`,
+            })
+        }
+    }catch(err){
+        return res.status(401).send({
+            error:err,
+        })
+    }
+}
+
+async function login(req,res){
+    const {email, password}=req.body;
+    try{
+        const userFound = await db.User.findOne({email:email});
+        const matchPassword = await db.User.comparePassword(password,userFound.password);
+        if(userFound) {
+            if(matchPassword){
+                const accessTokken = generateTokken({email:email});
+                const refreshTokken= randTokken.generate(256);
+
+                sessionData.refreshTokens[refreshTokken]=userFound.email;
+                return res.status(200).send({
+                    accessTokken:accessTokken,
+                    refreshTokken:refreshTokken,
+                    message:`Welcome ${userFound.firstName}`,
+                });
+            }else{
+                return res.status(400).send(`The password doesn't match`);
+            }
+            
+        }else{
+            return res.status(400).send(`The user not exist`);
+        }
+        
+    }catch(err){
+        return res.status(500).send({
+            error:err.message,
+        })
+    }
+    
+}
+
+async function getUsers(req,res){
+    try{
+    const users = await db.User.find({});
+
+    return res.status(200).send({
+        message:"user found",
+        data:users,
+       
+    })
+    }catch(err){
+        return res.status(500).send({
+            error:err.message,
+        })
+    }
+
 };
+
+async function getUser(req,res){
+    try{
+        const userGetted = await db.User.findById(req.params.id);
+       
+        return res.status(200).send({
+                user:userGetted,
+            })
+       
+        
+    }catch(err){
+        return res.status(500).send({
+            error:err,
+        })
+    }
+};
+// ,function (err) {
+//     if (err) return handleError(err)}
+
+async function delete_user(req, res){
+    try{
+         await db.User.deleteOne({_id:req.params.id});
+       
+            return res.status(200).send({
+                message:`The user  had been deleted`,
+            })    
+    }catch(err){
+        return res.status(500).send({
+            error:err,
+        })
+    }
+};
+async function update_user(req,res){
+    console.log("update in");
+    try{
+         await db.User.updateOne({_id:req.params.id}, req.body, {new:true});
+       
+            return res.status(200).send({
+                message:`The user ${req.body.firstName} had been changed`,
+            })    
+    }catch(err){
+        console.log("estoy en el error");
+        return res.status(500).send({
+            error:err,
+        })
+    }
+};
+
+module.exports={
+    register:register,
+    login:login,
+    getUsers:getUsers,
+    getUser:getUser,
+    delete_user:delete_user,
+    update_user:update_user,
+    refreshTokken:refreshTokken
+}
