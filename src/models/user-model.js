@@ -1,13 +1,10 @@
 const mongoose = require("mongoose");
 const { Schema } = require("mongoose");
-const { isEmail } = require("validator");
+const validator = require("validator");
+const db = require("./index");
 
-const UserSchema = Schema(
+const userSchema = new Schema(
   {
-    nickName: {
-      type: String,
-      unique: true,
-    },
     firstName: {
       type: String,
       trim: true,
@@ -22,17 +19,13 @@ const UserSchema = Schema(
       trim: true,
       unique: true,
       validate: {
-        validator: (value) => isEmail(value),
+        validator: (value) => validator.isEmail(value),
         message: (props) => `The email ${props.value} is not valid`,
       },
     },
-    password: {
-      type: String,
-      unique: true,
-    },
-    active: {
-      type: Boolean,
-      default: false,
+    roles: {
+      type: [mongoose.SchemaTypes.ObjectId],
+      ref: "role",
     },
   },
 
@@ -41,6 +34,13 @@ const UserSchema = Schema(
   },
 );
 
-const User = mongoose.model("user", UserSchema);
+// Scheme hooks
+userSchema.post("save", function (error, doc, next) {
+  if (error.code === 11000 && error.keyPattern.email)
+    next(new Error("Email already exists!"));
+  else next(error);
+});
+
+const User = mongoose.model("user", userSchema);
 
 module.exports = User;

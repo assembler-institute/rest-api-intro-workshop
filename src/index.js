@@ -1,17 +1,25 @@
 const app = require("./server");
 const { config } = require("./config");
 const connect = require("./db/connect");
+const seed = require("./db/seed");
 
-// uncomment if you need to seed the database before
-// const { seedMovies } = require("./db/seed");
+connect()
+  .then(async () => {
+    config.logger.info(`DB connected`);
 
-connect().then(async function onServerInit() {
-  config.logger.info(`DB connected`);
+    // await seed.seedUsers();
+    // await seed.seedPersons();
+    // await seed.seedMovies();
+    // await seed.seedRoles();
+    // await seed.seedUsers();
 
-  // uncomment if you need to seed the database before
-  // await seedMovies();
-
-  app.listen(config.app.PORT, () => {
-    config.logger.info(`Server running at http://localhost:${config.app.PORT}`);
+    // start Server
+    app.listen(config.app.PORT, () => {
+      config.logger.info(
+        `Server running at http://localhost:${config.app.PORT}`,
+      );
+    });
+  })
+  .catch((err) => {
+    config.logger.error(err);
   });
-});

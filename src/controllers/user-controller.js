@@ -1,114 +1,165 @@
 const db = require("../models");
-const { encryptString } = require("../utils/encrypt");
+const { encryptPassword } = require("../utils/encrypt");
+const { config } = require("../config");
 
-async function signUp(req, res, next) {
-  const { email, password, firstName, lastName } = req.body;
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+async function signIn(req, res, next) {
+  const { uid, email } = req.user;
 
   try {
-    const encryptedPassword = await encryptString(password);
-    const { _id } = await db.User.create({
+    const response = await db.User.findOne({ email: email });
+
+    if (response) return res.status(200).send({ email });
+
+    await db.User.create({
+      firebase_id: uid,
       email: email,
-      password: encryptedPassword,
-      firstName: firstName,
-      lastName: lastName,
-      active: true,
+      roles: req.body.roles,
     });
 
-    return res.status(200).send({
-      id: _id,
-      email,
-    });
+    if (response) return res.status(200).send({ email });
   } catch (err) {
-    console.log(err);
+    res.status(400).send({ message: err.message });
     next(err);
   }
 }
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
 async function fetchUsers(req, res, next) {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 5;
+
   try {
-    const users = await db.User.find().lean();
+    const count = await db.User.countDocuments();
+
+    const skip = (page - 1) * limit;
+    const totalPages = Math.ceil(count / limit);
+
+    const users = await db.User.find({}, { password: 0 })
+      .sort({ title: 1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("roles")
+      .lean();
+
+    const populatedUsers = users.map((user) => {
+      const roles = user.roles.map((role) => role.name);
+      user.roles = roles;
+      return user;
+    });
 
     res.status(200).send({
-      data: users,
+      page: page,
+      total_pages: totalPages,
+      data: populatedUsers,
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+    next(err);
   }
 }
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
 async function fetchUserById(req, res, next) {
-  const {
-    params: { id: userId },
-  } = req;
-
-  try {
-    const user = await db.User.findById(userId).lean();
-
-    res.status(200).send({
-      data: user,
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function updateUser(req, res, next) {
   const { id: userId } = req.params;
-  const { firstName, lastName } = req.body;
 
   try {
-    const updatedUser = await db.User.findOneAndUpdate(
-      {
-        _id: userId,
-      },
-      {
-        $set: {
-          firstName: firstName,
-          lastName: lastName,
-        },
-      },
-      {
-        new: true,
-      },
-    ).select({
-      firstName: 1,
-      lastName: 1,
-    });
+    const user = await db.User.findById(userId, { password: 0 })
+      .populate({
+        path: "roles",
+      })
+      .lean();
 
-    res.status(200).send({
-      data: updatedUser,
-    });
-  } catch (error) {
-    next(error);
+    if (!user) return res.status(400).send({ message: "User not found" });
+
+    const roles = user.roles.map((role) => role.name);
+    user.roles = roles;
+
+    res.status(200).send(user);
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+    next(err);
   }
 }
 
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+async function patchUser(req, res, next) {
+  const { id: userId } = req.params;
+
+  try {
+    const user = await db.User.findOneAndUpdate(
+      { _id: userId },
+      { ...req.body },
+      { new: true },
+    );
+
+    if (!user) return res.status(400).send({ message: `User not found` });
+
+    req.body.roles = req.rolesNames;
+
+    res.status(200).send({
+      message: "User updated successfully!",
+      data: req.body,
+    });
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+    next(err);
+  }
+}
+
+/**
+ *
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
 async function deleteUser(req, res, next) {
   const { id: userId } = req.params;
 
   try {
-    const result = await db.User.deleteOne({
-      _id: userId,
-    }).lean();
+    const user = await db.User.findByIdAndDelete(userId).select({
+      password: 0,
+    });
 
-    if (result.ok === 1 && result.deletedCount === 1) {
-      res.status(200).send({
-        data: "User removed",
-      });
-    } else {
-      res.status(500).send({
-        data: "User not removed",
-      });
+    if (!user) {
+      res.status(400).send({ message: "User not found!" });
+      return;
     }
-  } catch (error) {
-    next(error);
+
+    res.status(200).send({
+      message: "User deleted successfully!",
+      data: user,
+    });
+  } catch (err) {
+    res.status(400).send({ error: err.message });
+    next(err);
   }
 }
 
 module.exports = {
-  signUp: signUp,
-  fetchUsers: fetchUsers,
-  fetchUserById: fetchUserById,
-  updateUser: updateUser,
-  deleteUser: deleteUser,
+  signIn,
+  fetchUsers,
+  fetchUserById,
+  patchUser,
+  deleteUser,
 };

@@ -1,5 +1,10 @@
-const { errorMiddleware } = require("./error-middleware");
+const { validateCastCrew } = require("./credit-middleware");
+const auth = require("./auth-middleware");
+const user = require("./user-middleware");
+// const { validateCastCrew } = require("./user-middleware");
 
 module.exports = {
-  errorMiddleware: errorMiddleware,
+  validateCastCrew,
+  authMiddleware: auth,
+  userMiddleware: user,
 };
